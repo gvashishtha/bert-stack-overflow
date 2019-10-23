@@ -49,7 +49,7 @@ def init():
     global tokenizer, model
     # os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'azure-service-classifier')
     tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-    model_dir = os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'exports')
+    model_dir = os.path.join(os.getenv('AZUREML_MODEL_DIR'), 'model')
     model = TFBertForMultiClassification \
         .from_pretrained(model_dir, num_labels=len(labels))
 

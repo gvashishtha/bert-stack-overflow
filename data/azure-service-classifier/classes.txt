@@ -1,0 +1,5 @@
+azure-web-app-service
+azure-storage
+azure-devops
+azure-virtual-machine
+azure-functions

@@ -7,7 +7,7 @@ products:
 description: "Add 150 character max description"
 urlFragment: "update-this-to-unique-url-stub"
 ---
-
+**TODO** - add a build badge here
 # Automated StackOverflow question tagging with BERT and TensorFlow 2.0
 
 <!-- 
@@ -40,14 +40,16 @@ If you run the included notebooks Azure notebook, you will need to `pip install`
 
 ## Setup
 
-Explain how to prepare the sample once the user clones or downloads the repository. The section should outline every step necessary to install dependencies and set up any settings (for example, API keys and output folders).
+Create a Notebook VM by logging onto the Azure ML [workspace](https://ml.azure.com/) and creating a notebook. Clone this repository to your VM in order to run this code.
 
 ## Running the sample
 
+**TODO**
 Outline step-by-step instructions to execute the sample and see its output. Include steps for executing the sample from the IDE, starting specific services in the Azure portal or anything related to the overall launch of the code.
 
 ## Key concepts
 
+**TODO**
 Provide users with more context on the tools and services used in the sample. Explain some of the code that is being used and how services interact with each other.
 
 ## Contributing

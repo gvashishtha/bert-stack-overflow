@@ -20,6 +20,8 @@ Taxonomies for products and languages: https://review.docs.microsoft.com/new-hop
 
 Use this repository to learn how to fine-tune a BERT model to tag StackOverflow questions automatically with Azure Machine Learning.
 
+MLOps build status: [![Build Status](https://dev.azure.com/gopalv0408/tfworld_test/_apis/build/status/microsoft-ci-build-official?branchName=master)](https://dev.azure.com/gopalv0408/tfworld_test/_build/latest?definitionId=17&branchName=master)
+
 ## Contents
 
 Check out the file contents below.

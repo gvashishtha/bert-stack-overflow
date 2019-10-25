@@ -160,9 +160,9 @@ def main(_):
     test_dataset = get_dataset(os.path.join(FLAGS.data_dir, 'test.csv'), tokenizer, FLAGS.max_seq_length, labels_map)
 
     # Horovod: multiply batch size by number of gpu's
-    train_dataset = train_dataset.shuffle(100).repeat().batch(FLAGS.batch_size * hvd.size())
-    valid_dataset = valid_dataset.batch(FLAGS.batch_size * hvd.size())
-    test_dataset = test_dataset.batch(FLAGS.batch_size * hvd.size())
+    train_dataset = train_dataset.shuffle(100).repeat().batch(FLAGS.batch_size)
+    valid_dataset = valid_dataset.batch(FLAGS.batch_size)
+    test_dataset = test_dataset.batch(FLAGS.batch_size)
 
     # Horovod: add Horovod DistributedOptimizer.
     optimizer = tf.keras.optimizers.Adam(learning_rate=FLAGS.learning_rate*hvd.size(), epsilon=1e-08, clipnorm=1.0)
@@ -188,14 +188,14 @@ def main(_):
         # Horovod: using `lr = 1.0 * hvd.size()` from the very beginning leads to worse final
         # accuracy. Scale the learning rate `lr = 1.0` ---> `lr = 1.0 * hvd.size()` during
         # the first three epochs. See https://arxiv.org/abs/1706.02677 for details.
-        hvd.callbacks.LearningRateWarmupCallback(warmup_epochs=3, verbose=1),
-
-        AmlLogger()
+        hvd.callbacks.LearningRateWarmupCallback(warmup_epochs=3, verbose=1)
     ]
 
     # Horovod: save checkpoints only on worker 0 to prevent other workers from corrupting them.
     if hvd.rank() == 0:
         callbacks.append(tf.keras.callbacks.ModelCheckpoint('./checkpoint-{epoch}.h5'))
+        callbacks.append(AmlLogger())
+        callbacks.append(tf.keras.callbacks.TensorBoard(update_freq='batch'))
 
     # Horovod: write logs on worker 0.
     verbose = 1 if hvd.rank() == 0 else 0

@@ -95,7 +95,7 @@ The variable group should contain the following variables:
 | BASE_NAME                   | **If you are a TFworld workshop participant, fill in your participant ID (6 digit number following your resource group name)** [some name with fewer than 10 lowercase letters]                        |
 | TENANT_ID                   | Fill in the value of "Directory (tenant) ID" from service principal creation                            |
 | SUBSCRIPTION_ID             | Fill in your Azure subscription ID, found on the "Overview" page of your subscription in the Azure portal                            |
-| LOCATION                    | westus2                      |
+| LOCATION                    | southcentralus                  |
 | SP_APP_ID                   | Fill in "Application (client) ID" from service principal creation |
 | SP_APP_SECRET               | Fill in the secret from service principal creation |
 | DS_KEY                      | Fill in the datastore key you were given |
@@ -107,8 +107,6 @@ Make sure to select the **Allow access to all pipelines** checkbox in the variab
 
 ### 6. Create an Azure Resource Manager service connection
 
-> Note: If you are a TF World workshop participant, you can skip this step, as your resources were created for you.
-
 In order to create resources automatically in the next step, you need to create an Azure Resource Manager connection in Azure DevOps.
 
 Access the window below by clicking on "Project settings" (the gear icon in the bottom left of the Azure DevOps window).
@@ -117,9 +115,9 @@ Access the window below by clicking on "Project settings" (the gear icon in the 
 
 Click on "Service connections." Under "New service connection" (top left), choose "Azure Resource Manager." Set "Scope level" to "Subscription" and choose your subscription.
 
-![create service connection](./images/create-rm-service-connection.png)
+Give the connection name **``AzureResourceConnection``** as this value is hard-coded in the pipeline definition. Fill in the **``Resource Group``** field with the name of the Resource Group you are using.
 
-Give the connection name **``AzureResourceConnection``** as this value is hard-coded in the pipeline definition. Leave the **``Resource Group``** field empty.
+![create service connection](./images/azure-resource-connection.png)
 
 ### 7. Create resources
 
@@ -149,7 +147,7 @@ Let's review what we have so far. We have created a Machine learning workspace i
 
 #### Pipeline overview
 
-First, [open](aka.ms/tfworld_build) up the build .yml file in GitHub. 
+First, [open](.pipelines/azdo-ci-build-train.yml) up the build .yml file in GitHub. 
 
 The YAML file includes the following steps:
 
@@ -180,7 +178,7 @@ The pipeline you will build in the next step leverages the **Azure Machine Learn
 
 ### 10. Create Azure ML service connection
 
-Even though we created a service connection earlier in order to create resources, we need a different service connection to the **mlops-AML-WS** workspace in order to access the trained model. To create this new service connection, go to the project settings (by clicking on the gear icon at the bottom left of the screen), and then click on **Service connections** under the **Pipelines** section:
+Even though we created a service connection earlier in order to create resources, we need a different service connection to your workspace in order to access the trained model. To create this new service connection, go to the project settings (by clicking on the gear icon at the bottom left of the screen), and then click on **Service connections** under the **Pipelines** section:
 
  > Note: Creating service connection using Azure Machine Learning extension requires your user to have 'Owner' or 'User Access Administrator' permissions on the Workspace.
 

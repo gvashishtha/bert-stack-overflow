@@ -56,8 +56,9 @@ def init():
         model = TFBertForMultiClassification \
             .from_pretrained(model_dir, num_labels=len(labels))
     except OSError:
-        raise OSError('folder actually contained {}'.format(os.listdir(model_dir)))
-        raise
+        raise OSError(
+            'folder actually contained {}'.format(os.listdir(model_dir)))
+
 
 def run(raw_data):
 

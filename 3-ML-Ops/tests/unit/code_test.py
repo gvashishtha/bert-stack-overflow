@@ -3,7 +3,7 @@ import os
 import azureml
 
 sys.path.insert(1,   # NOQA: E402
-    os.path.abspath("./3-ML-Ops/ml_service/util"))   # NOQA: E402
+    os.path.abspath("./3-ML-Ops/util"))   # NOQA: E402
 from distutils.version import StrictVersion
 from workspace import get_workspace
 

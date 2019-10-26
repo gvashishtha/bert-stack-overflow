@@ -1,0 +1,29 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - 3-ML-Ops/create-resources/arm-templates/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: devopsforai-aml-vg
+
+
+steps:
+- task: AzureResourceGroupDeployment@2
+  inputs:
+    azureSubscription: 'AzureResourceConnection'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'AML-RG-$(BASE_NAME)'
+    location: $(LOCATION)
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/3-ML-Ops/create-resources/arm-templates/cloud-environment.json'
+    overrideParameters: '-baseName $(BASE_NAME) -location $(LOCATION)'
+    deploymentMode: 'Incremental'
+  displayName: 'Deploy MLOps resources to Azure'
+
+  

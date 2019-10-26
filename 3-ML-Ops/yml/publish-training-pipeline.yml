@@ -1,0 +1,40 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+variables:
+- group: devopsforai-aml-vg
+
+steps:
+- template: train-dependencies.yml
+
+- bash: |
+   # Invoke the Python building and publishing a training pipeline
+   python3 $(Build.SourcesDirectory)/3-ML-Ops/train-and-register-model.py
+  failOnStderr: 'false'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+  displayName: 'Publish Azure Machine Learning Pipeline'
+  enabled: 'true'
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/3-ML-Ops'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    Contents: |
+      scripts/scoring/**
+      create-resources/**
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    ArtifactName: 'mlops-pipelines'
+    publishLocation: 'container'
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    TargetPath: '$(Build.ArtifactStagingDirectory)'  

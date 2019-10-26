@@ -1,0 +1,35 @@
+# this pipeline should be ignored for now
+parameters:
+  pipelineType: 'training'
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Use Python 3.6'
+  inputs:
+    versionSpec: 3.6
+
+- bash: 'pip install --upgrade -r requirements.txt '
+  workingDirectory: '$(Build.SourcesDirectory)/3-ML-Ops/create-resources'
+  displayName: 'Bash Script'
+
+- script: |
+   flake8 --output-file=$(Build.BinariesDirectory)/lint-testresults.xml --format junit-xml  
+  workingDirectory: '$(Build.SourcesDirectory)/3-ML-Ops'
+  displayName: 'Run linting'
+  enabled: 'true'
+  
+- script: |
+   pytest --junitxml=$(Build.BinariesDirectory)/unit-testresults.xml $(Build.SourcesDirectory)/3-ML-Ops/tests/unit
+  displayName: 'Run unit tests'
+  enabled: 'true'
+  env:
+    SP_APP_SECRET: '$(SP_APP_SECRET)'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '$(Build.BinariesDirectory)/*-testresults.xml'
+    testRunTitle: 'Linting & Unit tests'
+    failTaskOnFailedTests: true
+  displayName: 'Publish linting and unit test results'
+  enabled: 'true'

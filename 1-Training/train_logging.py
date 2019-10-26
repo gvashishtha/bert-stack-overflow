@@ -138,7 +138,12 @@ def main(_):
     model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 
     # Train and evaluate model
-    model.fit(train_dataset, epochs=FLAGS.num_epochs, steps_per_epoch=FLAGS.steps_per_epoch, validation_data=valid_dataset, callbacks=[AmlLogger()])
+    model.fit(train_dataset, epochs=FLAGS.num_epochs, 
+              steps_per_epoch=FLAGS.steps_per_epoch, validation_data=valid_dataset, 
+              callbacks=[
+                  AmlLogger(),
+                  tf.keras.callbacks.TensorBoard(update_freq='batch')]
+             )
     model.evaluate(test_dataset)
 
     # Export the trained model

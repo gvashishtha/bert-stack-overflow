@@ -13,7 +13,8 @@ Following the convention of most AzureML Public Preview features, Batch Inferenc
 
 If you're unfamiliar with creating a new Python environment, you may follow this example for [creating a conda environment](https://docs.microsoft.com/en-us/azure/machine-learning/service/how-to-configure-environment#local).  Batch Inference package can be installed through the following pip command.
 ```
-pip install --extra-index-url https://pypi.python.org/simple --index-url https://azuremlsdktestpypi.azureedge.net/sdk
+pip install --extra-index-url https://pypi.python.org/simple --index-url https://azuremlsdktestpypi.azureedge.net/sdk-release/Candidate/604C89A437BA41BD942B4F46D9A3591D/ azureml-contrib-pipeline-steps azureml-widgets
+
 ```
 
 ### Creation of Azure Machine Learning Workspace

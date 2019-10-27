@@ -1,5 +1,10 @@
 # TensorFlow 2.0 with Azure MLOps
 
+| Pipeline step | Status badge|
+| ------------- | ------------|
+|Resource creation | [![resource-create-bade](https://dev.azure.com/gopalv0408/status-badge/_apis/build/status/create-resources?branchName=master)](https://dev.azure.com/gopalv0408/status-badge/_build/latest?definitionId=19&branchName=master) |
+| Build | [![Build Status](https://dev.azure.com/gopalv0408/status-badge/_apis/build/status/ci-build?branchName=master)](https://dev.azure.com/gopalv0408/status-badge/_build/latest?definitionId=20&branchName=master) |
+
 ## Overview
 
 > Note: While they are not required to complete this exercise, the notebooks on [training](aka.ms/tfworld_training) and [inferencing](aka.ms/tfworld_inferencing) that are included in this repo provide useful context for this exercise.

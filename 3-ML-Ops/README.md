@@ -7,9 +7,13 @@
 
 ## Overview
 
-> Note: While they are not required to complete this exercise, the notebooks on [training](aka.ms/tfworld_training) and [inferencing](aka.ms/tfworld_inferencing) that are included in this repo provide useful context for this exercise.
-
 For this exercise, we assume that you have trained and deployed a machine learning model and that you are now ready to manage the end-to-end lifecycle of your model. [MLOps](https://docs.microsoft.com/azure/machine-learning/service/concept-model-management-and-deployment) can help you to automatically deploy your model as a web application while implementing quality benchmarks, strict version control, model monitoring, and providing an audit trail.
+
+## Prerequisites
+
+While they are not required to complete this exercise, the notebooks on [training](aka.ms/tfworld_training) and [inferencing](aka.ms/tfworld_inferencing) that are included in this repo provide useful context for this exercise.
+
+Additionally, this tutorial assumes you have sufficient quota allocated in the **southcentralus** region to deploy a **Standard_NC6s_V3** and two **DSv2** nodes.
 
 ## Getting Started with this Repo
 

@@ -101,7 +101,7 @@ The variable group should contain the following variables:
 
 | Variable Name               | Value              |
 | --------------------------- | ---------------------------- |
-| BASE_NAME                   | **If you are a TFworld workshop participant, fill in your participant ID (6 digit number following your resource group name)** [some name with fewer than 10 lowercase letters]                        |
+| BASE_NAME                   | **If you are a TFworld workshop participant, fill in your participant ID (6 digit number following your resource group name)** [otherwise, use some name with fewer than 10 lowercase letters]                        |
 | TENANT_ID                   | Fill in the value of "Directory (tenant) ID" from service principal creation                            |
 | SUBSCRIPTION_ID             | Fill in your Azure subscription ID, found on the "Overview" page of your subscription in the Azure portal                            |
 | LOCATION                    | southcentralus                  |
@@ -116,7 +116,7 @@ Make sure to select the **Allow access to all pipelines** checkbox in the variab
 
 ### 6. Create an Azure Resource Manager service connection
 
-In order to create resources automatically in the next step, you need to create an Azure Resource Manager connection in Azure DevOps.
+In order to access your Azure subscription, you need an Azure Resource Manager connection in Azure DevOps.
 
 Access the window below by clicking on "Project settings" (the gear icon in the bottom left of the Azure DevOps window).
 
@@ -124,7 +124,9 @@ Access the window below by clicking on "Project settings" (the gear icon in the 
 
 Click on "Service connections." Under "New service connection" (top left), choose "Azure Resource Manager." Set "Scope level" to "Subscription" and choose your subscription.
 
-Give the connection name **``AzureResourceConnection``** as this value is hard-coded in the pipeline definition. Fill in the **``Resource Group``** field with the name of the Resource Group you are using.
+Give the connection name **``AzureResourceConnection``** as this value is hard-coded in the pipeline definition. 
+
+If you are a TFWorld Workshop participant, fill in the **``Resource Group``** field with the name of the Resource Group you are using, because you do not Subscription-level permissions.
 
 ![create service connection](./images/azure-resource-connection.png)
 
@@ -138,13 +140,9 @@ Click on "Pipelines" -> "Build" on the left-hand side, then "New pipeline" to cr
 
 ![build connnect step](./images/build-connect.png)
 
-Refer to an **Existing Azure Pipelines YAML file**:
+Refer to an **Existing Azure Pipelines YAML file**, then choose the one corresponding to **iac-create-environment.yml**.
 
-![configure step](./images/select-iac-pipeline.png)
-
-Having done that, run the pipeline:
-
-![iac run](./images/run-iac-pipeline.png)
+Having done that, run the pipeline.
 
 Check out created resources in the [Azure Portal](portal.azure.com):
 
@@ -169,9 +167,7 @@ The YAML file includes the following steps:
 
 Now that you understand the steps in your pipeline, let's see what it actually does!
 
-In your [Azure DevOps](https://dev.azure.com) project, use the left-hand menu to navigate to "Pipelines"->"Build." Select "New pipeline," and then select "GitHub." If you are already authenticated into GitHub, you should see the repository you forked earlier. Select "Existing Azure Pipelines YAML File." In the pop-up blade, select the correct branch of your GitHub repo and select the path referring to [publish-training-pipeline.yml] (./yml/publish-training-pipeline.yml) in your forked **GitHub** repository:
-
-![configure ci build pipeline](./images/ci-build-pipeline-configure.png)
+In your [Azure DevOps](https://dev.azure.com) project, use the left-hand menu to navigate to "Pipelines"->"Build." Select "New pipeline," and then select "GitHub." If you are already authenticated into GitHub, you should see the repository you forked earlier. Select "Existing Azure Pipelines YAML File." In the pop-up blade, select the correct branch of your GitHub repo and select the path referring to [publish-training-pipeline.yml](./yml/publish-training-pipeline.yml) in your forked **GitHub** repository.
 
 You will now be redirected to a review page. Check to make sure you still understand what this pipeline is doing. If everything looks good, click "Run."
 
@@ -232,7 +228,7 @@ Click on the plus icon on the right hand side of the cell which says "Agent job.
 | Parameter                         | Value                                                                                                |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Display Name                      | Azure ML Model Deploy                                                                                |
-| Azure ML Workspace                | <fill in your workspace name>                                                                        |
+| Azure ML Workspace                | Fill in the name of your Azure ML service connection                                                               |
 | Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/inference_config.yml`      |
 | Model Deployment Target           | Azure Kubernetes Service                                                                             |
 | Select AKS Cluster for Deployment | myaks (**This value is specified in the .env file, and you should have an existing cluster with this name**)        |
@@ -240,87 +236,21 @@ Click on the plus icon on the right hand side of the cell which says "Agent job.
 | Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/deployment_config_aks.yml` |
 | Overwrite existing deployment     | X                                                                                                    |
 
-
 Then click "Save."
+
+After you enable continuous integration (next step), your pipeline should look like this:
+
+![final-release](./images/final-release.png)
 
 #### Enable continuous integration
 
-Go to "Pipelines" -> "Releases" and then click on your new pipeline. In the top right of each artifact you specified, you should see a lightning bolt. Click on this lightning bolt and then toggle the trigger for "Continuous deployment." This will ensure that the deployment is released every time one of these artifacts changes. Make sure to save your changes.
+Go to "Pipelines" -> "Releases," click on your new pipeline, then click "Edit." In the top right of each artifact you specified, you should see a lightning bolt. Click on this lightning bolt and then toggle the trigger for "Continuous deployment." This will ensure that the deployment is released every time one of these artifacts changes. Make sure to save your changes.
 
-<!-- **TODO**: Explore ACI cluster creation for QA -->
+To kick off your first deployment, click "Create release."
 
- <!-- There will be a **``QA``** environment running on [Azure Container Instances](https://azure.microsoft.com/en-us/services/container-instances/) and a **``Prod``** environment running on [Azure Kubernetes Service](https://azure.microsoft.com/en-us/services/kubernetes-service). This is the final picture of what your release pipeline should look like:
+![create-release-button](./images/create-release-button.png)
 
-![deploy model](./images/deploy-model.png) -->
-
-<!-- 
-![model artifact](./images/model-artifact.png)
-
-Go to the new **Releases Pipelines** section, and click new to create a new release pipeline. A first stage is automatically created and choose **start with an Empty job**. Name the stage **QA (ACI)** and add a single task to the job **Azure ML Model Deploy**. Make sure that the Agent Specification is ubuntu-16.04 under the Agent Job:
-
-![deploy aci](./images/deploy-aci.png)
-
-Specify task parameters as it is shown in the table below:
-
-
-| Parameter                     | Value                                                                                                |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Display Name                  | Azure ML Model Deploy                                                                                |
-| Azure ML Workspace            | mlops-AML-WS                                                                                         |
-| Inference config Path         | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/inference_config.yml`      |
-| Model Deployment Target       | Azure Container Instance                                                                             |
-| Deployment Name               | mlopspython-aci                                                                                      |
-| Deployment Configuration file | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/deployment_config_aci.yml` |
-| Overwrite existing deployment | X                                                                                                    |
- -->
-<!-- 
-In a similar way create a stage **Prod (AKS)** and add a single task to the job **Azure ML Model Deploy**. Make sure that the Agent Specification is ubuntu-16.04 under the Agent Job:
-
-![deploy aks](./images/deploy-aks.png)
-
-
-Similarly to the **Invoke Training Pipeline** release pipeline, previously created, in order to trigger a coutinuous integration, click on the lightning bolt icon, make sure the **Continuous deployment trigger** is checked and save the trigger:
-
-![Automate Deploy Model Pipeline](./images/automate_deploy_model_pipeline.png) -->
-<!-- 
-**Note:** Creating of a Kubernetes cluster on AKS is out of scope of this tutorial, so you should take care of it on your own.
-
-**Deploy trained model to Azure Web App for containers**
-
-Note: This is an optional step and can be used only if you are deploying your scoring service on Azure Web Apps.
-
-[Create Image Script](../util/create_scoring_image.py)
-can be used to create a scoring image from the release pipeline. Image created by this script will be registered under Azure Container Registry (ACR) instance that belongs to Azure Machine Learning Service. Any dependencies that scoring file depends on can also be packaged with the container with Image config. To learn more on how to create a container with AML SDK click [here](https://docs.microsoft.com/en-us/python/api/azureml-core/azureml.core.image.image.image?view=azure-ml-py#create-workspace--name--models--image-config-).
-
-Below is release pipeline with two tasks one to create an image using the above script and second is the deploy the image to Web App for containers
-![release_webapp](./images/release-webapp-pipeline.PNG)
-
-For the bash script task to invoke the [Create Image Script](../util/create_scoring_image.py), specify the following task parameters:
-
-| Parameter          | Value                                                                                               |
-| ------------------ | --------------------------------------------------------------------------------------------------- |
-| Display Name       | Create Scoring Image                                                                                |
-| Script             | python3 $(System.DefaultWorkingDirectory)/\_MLOpsPythonRepo/util/create_scoring_image.py  |
-
-Finally
-![release_createimage](./images/release-task-createimage.PNG)
-
-Finally for the Azure WebApp on Container Task, specify the following task parameters as it is shown in the table below:
-
-
-| Parameter          | Value                                                                                               |
-| ------------------ | --------------------------------------------------------------------------------------------------- |
-| Azure subscription | Subscription used to deploy Web App                                                                 |
-| App name           | Web App for Containers name                                                                         |
-| Image name         | Specify the fully qualified container image name. For example, 'myregistry.azurecr.io/nginx:latest' |
-
-![release_webapp](./images/release-task-webappdeploy.PNG)
-
-
-Save the pipeline and create a release to trigger it manually. To create the trigger, click on the "Create release" button on the top right of your screen, leave the fields blank and click on **Create** at the bottom of the screen. Once the pipeline execution is finished, check out deployments in the **mlops-AML-WS** workspace. -->
-
-
-### 10. Test your deployed model
+### 12. Test your deployed model
 
 Open your machine learning workspace in the [Azure portal](portal.azure.com), and click on "Deployments" on the lefthand side. Open up your AKS cluster, and use the Scoring URI and Primary Key for this step.
 
@@ -347,4 +277,4 @@ print("Given your question of \"{}\", we predict the tag is {} with probability 
 Congratulations! You have two pipelines set up end to end:
    - Build pipeline: triggered on code change to master branch on GitHub, performs linting, unit testing and publishing a training pipeline. Also train, evaluate and register a model
    <!-- - Release Trigger pipeline: runs a published training pipeline to  -->
-   - Release Deployment pipeline: deploys a model to a Prod (AKS) environment
+   - Release Deployment pipeline: triggered when build artifacts change or registered model changes, deploys a model to a Prod (AKS) environment

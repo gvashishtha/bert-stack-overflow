@@ -107,8 +107,6 @@ The variable group should contain the following variables:
 | LOCATION                    | southcentralus                  |
 | SP_APP_ID                   | Fill in "Application (client) ID" from service principal creation |
 | SP_APP_SECRET               | Fill in the secret from service principal creation |
-| DS_KEY                      | Fill in the datastore key you were given |
-
 
 Mark **SP_APP_SECRET** variable as a secret one.
 
@@ -189,11 +187,9 @@ Even though we created a service connection earlier in order to create resources
 
 ![workspace connection](./images/workspace-connection.png)
 
-### 11. Deploy the Model
+### 11. Create the release pipeline.
 
 The final step is to deploy your model with a release pipeline.
-
-#### Create the release pipeline
 
 Go to "Pipelines" -> "Releases." In the top right of the second navigation bar from the left, select "New" -> "New release pipeline." Select "Empty job" under "Select a template" on the blade that pops up. 
 
@@ -203,7 +199,7 @@ Call this stage "Prod," by editing the value of "Stage name" in the blade on the
 
 ![Rename prod](./images/prod.png)
 
-#### Add artifacts
+### 12. Add artifacts to your pipeline
 
 In order for this Release pipeline to work, it needs access to the trained model we produced in the build pipeline. The release pipeline accesses the trained model as part of something called an Artifact. To give this release pipeline access to the relevant artifacts, click on "Add an artifact" in the "Artifacts" box.
 
@@ -213,13 +209,35 @@ Next, select "AzureML Model Artifact" (you may need to click "Show more"). Selec
 
 Let's also give the release pipeline access to the build artifact, which contains some of the files that the release pipeline needs in order to run. Click on "Add" in the "Artifacts" box, select "Build," and ensure that the source alias is set to "_ci-build". This naming is necessary for the next step to work properly.
 
-#### Add tasks
+### 13. Add QA stage
 
-Great, so your release pipeline has access to your artifacts, but it doesn't actually _do_ anything. Let's give it some work.
+Great, so your release pipeline has access to your artifacts, but it doesn't actually _do_ anything. Let's give it some work. First, let's have it deploy to a quality assurance (QA) instance hosted with Azure Container Instances (ACI).
 
 Click on the hyperlinked text that says "1 job, 0 task" in the name of the stage.
 
 Click on the plus icon on the right hand side of the cell which says "Agent job." On the menu which appears, search for "Azure ML Model Deploy," and click "Add."
+
+ Click on the red text which says "Some settings need attention" and fill in the values shown in the table below:
+
+| Parameter                         | Value                                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Display Name                      | Azure ML Model Deploy                                                                                |
+| Azure ML Workspace                | Fill in the name of your Azure ML service connection                                                               |
+| Inference config Path             | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/inference_config.yml`      |
+| Model Deployment Target           | Azure Container Instance                                                                             |
+| Deployment Name                   | bert-stack-overflow-aci                                                                              |
+| Deployment Configuration file     | `$(System.DefaultWorkingDirectory)/_ci-build/mlops-pipelines/scripts/scoring/deployment_config_aci.yml` |
+| Overwrite existing deployment     | X                                                                                                    |
+
+Then click "Save."
+
+### 14. Add Prod Stage
+
+Under the box corresponding to the QA stage, click Prod.
+
+Click on the plus icon on the right hand side of the cell which says "Agent job." On the menu which appears, search for "Azure ML Model Deploy," and click "Add."
+
+ Click on the red text which says "Some settings need attention" and fill in the values shown in the table below:
 
 ![create release example](./images/deploy-task.png)
 
@@ -242,7 +260,7 @@ After you enable continuous integration (next step), your pipeline should look l
 
 ![final-release](./images/final-release.png)
 
-#### Enable continuous integration
+### 14. Enable continuous integration
 
 Go to "Pipelines" -> "Releases," click on your new pipeline, then click "Edit." In the top right of each artifact you specified, you should see a lightning bolt. Click on this lightning bolt and then toggle the trigger for "Continuous deployment." This will ensure that the deployment is released every time one of these artifacts changes. Make sure to save your changes.
 
@@ -250,7 +268,7 @@ To kick off your first deployment, click "Create release."
 
 ![create-release-button](./images/create-release-button.png)
 
-### 12. Test your deployed model
+### 15. Test your deployed model
 
 Open your machine learning workspace in the [Azure portal](portal.azure.com), and click on "Deployments" on the lefthand side. Open up your AKS cluster, and use the Scoring URI and Primary Key for this step.
 
@@ -262,15 +280,18 @@ Let's see if we can submit a query to our deployed model! Open up a Python inter
 import json
 import requests
 
-
 url = '<your scoring url here>'
 api_key = '<your API key here>'
-payload = {'text': 'I am trying to release a website'}
-headers = {'content-type': 'application/json', 'Authorization':('Bearer '+ api_key)}
-response = requests.post(url, data=json.dumps(payload), headers=headers)
-response_body = json.loads(response.content)  # convert to dict for next step
-print("Given your question of \"{}\", we predict the tag is {} with probability {}"
-      .format(payload.get("text"), response_body.get("prediction"), response_body.get("probability")))
+
+def predict_tags(question_body):
+    payload = {'text': question_body}
+    headers = {'content-type': 'application/json', 'Authorization':('Bearer '+ api_key)}
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+    response_body = json.loads(response.content)  # convert to dict for next step
+    print("Given your question of \"{}\", we predict the tag is {} with probability {}"
+          .format(payload.get("text"), response_body.get("prediction"), response_body.get("probability")))
+
+predict_tags('How can I specify Service Principal in devops pipeline when deploying virtual machine?')
 ```
 
 

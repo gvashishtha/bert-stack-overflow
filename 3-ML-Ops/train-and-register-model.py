@@ -61,11 +61,11 @@ def main():
                       'tensorflow-gpu>=2.0.0'])
     )
     run_config.environment.docker.enabled = True
-
+    
     datastore_name = 'tfworld'
-    container_name = 'azureml-blobstore-7c6bdd88-21fa-453a-9c80-16998f02935f'
-    account_name = 'tfworld6818510241'
-    sas_token = '?sv=2019-02-02&ss=bfqt&srt=sco&sp=rl&se=2019-11-08T05:12:15Z&st=2019-10-23T20:12:15Z&spr=https&sig=eDqnc51TkqiIklpQfloT5vcU70pgzDuKb5PAGTvCdx4%3D'  # noqa: E501
+    container_name = 'azure-service-classifier'
+    account_name = 'johndatasets'
+    sas_token = '?sv=2019-02-02&ss=bfqt&srt=sco&sp=rl&se=2021-06-02T03:40:25Z&st=2020-03-09T19:40:25Z&spr=https&sig=bUwK7AJUj2c%2Fr90Qf8O1sojF0w6wRFgL2c9zMVCWNPA%3D'
 
     try:
         existing_datastore = Datastore.get(aml_workspace, datastore_name)
@@ -79,7 +79,7 @@ def main():
                                            )
 
     azure_dataset = Dataset.File.from_files(
-        path=(existing_datastore, 'azure-service-classifier/data'))
+        path=(existing_datastore, 'data'))
     azure_dataset = azure_dataset.register(
         workspace=aml_workspace,
         name='Azure Services Dataset',
@@ -114,7 +114,7 @@ def main():
         use_gpu=True,
         pip_packages=[
             'transformers==2.0.0',
-            'azureml-dataprep[fuse,pandas]==1.1.22'])
+            'azureml-dataprep[fuse,pandas]==1.3.0'])
 
     train_step = EstimatorStep(
         name="Train Model",

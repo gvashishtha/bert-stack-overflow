@@ -135,8 +135,8 @@ def main(_):
     optimizer = tf.keras.optimizers.Adam(learning_rate=FLAGS.learning_rate, epsilon=1e-08, clipnorm=1.0)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
-    #model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 
+    # Train and evaluate model
     for item, label in train_dataset:
         with tf.GradientTape() as tape:
             prediction, = model(item, training=True)

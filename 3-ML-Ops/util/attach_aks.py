@@ -9,11 +9,10 @@ def get_aks(
 ):
     # Verify that cluster does not exist already
     try:
-        if compute_name in workspace.compute_targets:
-            aks_target = workspace.compute_targets[compute_name]
-            if aks_target and type(aks_target) is AksCompute:
-                print('Found existing compute target ' + compute_name
-                      + ' so using it.')
+        aks_target = workspace.compute_targets.get(compute_name)
+        if aks_target is not None and type(aks_target) is AksCompute:
+            print('Found existing compute target ' + compute_name
+                + ' so using it.')  # noqa: E127
         else:
             prov_config = AksCompute.provisioning_configuration(
                 cluster_purpose=AksCompute.ClusterPurpose.DEV_TEST)
@@ -34,4 +33,4 @@ def get_aks(
     except ComputeTargetException as e:
         print(e)
         print('An error occurred trying to provision compute.')
-        exit()
+        raise

@@ -6,4 +6,4 @@ python-dotenv>=0.10.3
 flake8
 flake8_formatter_junit_xml
 azure-cli==2.0.71
-azureml-dataprep[pandas]
+azureml-dataprep[pandas]==1.3.0
